@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Customizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        @supports (font-variation-settings: normal) {
+            body { font-family: 'Inter var', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        }
+
+        .app-bar {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-bottom: 30px;
+        }
+
+        .app-bar h1 {
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 24px;
+            padding: 24px;
+            border: 1px solid #e2e8f0;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title::before {
+            content: "";
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #3b82f6;
+        }
+
+        .file-upload-section {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transform: translateY(-1px);
+        }
+
+        .btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-large {
+            padding: 16px 24px;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .file-info {
+            color: #64748b;
+            font-size: 14px;
+            padding: 12px;
+            background-color: #f8fafc;
+            border-radius: 8px;
+            border: 1px dashed #cbd5e1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-info::before {
+            content: "📄";
+            font-size: 16px;
+        }
+
+        .textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background-color: #f8fafc;
+        }
+
+        .textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            background-color: white;
+        }
+
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
+            margin: 40px 0;
+        }
+
+        .results-section {
+            margin-top: 30px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .results-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .results-title::before {
+            content: "✨";
+        }
+
+        .code-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            background-color: #f1f5f9;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin-bottom: 20px;
+            color: #334155;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            color: #64748b;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(59, 130, 246, 0.1);
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .snackbar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ef4444;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .snackbar::before {
+            content: "⚠️";
+        }
+
+        .snackbar.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .container {
+                padding: 0 16px 30px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .app-bar h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="app-bar">
+        <h1>Resume Customizer</h1>
+    </header>
+
+    <div class="container">
+        <!-- File Upload Section -->
+        <div class="card">
+            <h2 class="section-title">Upload Your LaTeX Resume</h2>
+            <div class="file-upload-section">
+                <button class="btn" onclick="selectFile()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    Select .tex File
+                </button>
+                <input type="file" id="fileInput" accept=".tex" onchange="handleFileSelect(event)">
+                <p class="file-info" id="fileInfo">No file selected</p>
+            </div>
+        </div>
+
+        <!-- Job Description Section -->
+        <div class="card">
+            <h2 class="section-title">Enter Job Description</h2>
+            <textarea 
+                class="textarea" 
+                id="jobDescription" 
+                placeholder="Paste the job description here..."
+                rows="8"
+            ></textarea>
+        </div>
+
+        <!-- Process Button -->
+        <button class="btn btn-large" id="processBtn" onclick="processResume()">
+            <span id="processText">Customize Resume</span>
+            <div class="loading hidden" id="loadingSpinner">
+                <div class="spinner"></div>
+                <span>Processing...</span>
+            </div>
+        </button>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="hidden">
+            <div class="divider"></div>
+            <h2 class="results-title">Customized Resume</h2>
+            <div class="card">
+                <div class="code-container" id="modifiedLatex"></div>
+                <button class="btn" onclick="downloadFile()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Download Modified Resume
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Snackbar for error messages -->
+    <div class="snackbar" id="snackbar"></div>
+
+    <script>
+        let latexContent = '';
+        let fileName = '';
+        let modifiedLatex = '';
+        let isProcessing = false;
+
+        const API_BASE_URL = 'https://api.deepseek.com/v1';
+        const API_KEY = 'sk-b0ecb9d924fb4c618fb548eb9e3c70e2'; // Add your API key here
+
+        function selectFile() {
+            document.getElementById('fileInput').click();
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file && file.name.endsWith('.tex')) {
+                fileName = file.name;
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    latexContent = e.target.result;
+                    document.getElementById('fileInfo').textContent = fileName;
+                };
+                
+                reader.readAsText(file);
+            } else {
+                showError('Please select a valid .tex file');
+            }
+        }
+
+        async function processResume() {
+            if (!latexContent) {
+                showError('Please upload a resume file');
+                return;
+            }
+
+            const jobDescription = document.getElementById('jobDescription').value.trim();
+            if (!jobDescription) {
+                showError('Please provide a job description');
+                return;
+            }
+
+            if (isProcessing) return;
+
+            setProcessingState(true);
+
+            try {
+                const result = await customizeResume(latexContent, jobDescription);
+                modifiedLatex = result;
+                showResults();
+            } catch (error) {
+                showError('Processing failed: ' + error.message);
+            } finally {
+                setProcessingState(false);
+            }
+        }
+
+        async function customizeResume(latexContent, jobDescription) {
+            const prompt = `
+            Customize this LaTeX resume to match the job description exactly while preserving all formatting. Follow these rules:
+
+1. Content Changes Only:
+- Highlight matching technical skills first
+- Reword experience bullets for job relevance
+- Adjust projects to showcase required tech
+- Keep education unchanged
+
+2. Strict Format Preservation:
+- Maintain ALL original LaTeX commands
+- Keep identical section ordering
+- Preserve EXACT spacing between sections (do not add/remove blank lines)
+- Don't modify environments or styling
+- Don't add bullet point for styling it is taking too much spaces
+
+3. Output:
+- Return pure LaTeX code only
+- No explanations or commentary
+- Must compile exactly as original
+
+Job: ${jobDescription}
+Resume: ${latexContent}
+
+Deliver compilation-ready LaTeX matching original spacing precisely.
+            `;
+
+            const response = await fetch(`${API_BASE_URL}/chat/completions`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${API_KEY}`,
+                },
+                body: JSON.stringify({
+                    model: 'deepseek-chat',
+                    messages: [
+                        {
+                            role: 'system',
+                            content: 'You are a professional resume writer that specializes in technical resumes. Only modify text content between LaTeX commands.'
+                        },
+                        {
+                            role: 'user',
+                            content: prompt
+                        }
+                    ],
+                    temperature: 0.5,
+                    max_tokens: 4000,
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data.choices[0].message.content;
+        }
+
+        function setProcessingState(processing) {
+            isProcessing = processing;
+            const processBtn = document.getElementById('processBtn');
+            const processText = document.getElementById('processText');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+
+            if (processing) {
+                processBtn.disabled = true;
+                processText.classList.add('hidden');
+                loadingSpinner.classList.remove('hidden');
+            } else {
+                processBtn.disabled = false;
+                processText.classList.remove('hidden');
+                loadingSpinner.classList.add('hidden');
+            }
+        }
+
+        function showResults() {
+            document.getElementById('modifiedLatex').textContent = modifiedLatex;
+            document.getElementById('resultsSection').classList.remove('hidden');
+        }
+
+        function downloadFile() {
+            if (!modifiedLatex) return;
+
+            const blob = new Blob([modifiedLatex], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName || 'customized_resume.tex';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function showError(message) {
+            const snackbar = document.getElementById('snackbar');
+            snackbar.textContent = message;
+            snackbar.classList.add('show');
+            
+            setTimeout(() => {
+                snackbar.classList.remove('show');
+            }, 4000);
+        }
+    </script>
+</body>
+</html>

@@ -424,30 +424,42 @@
 
         async function customizeResume(latexContent, jobDescription) {
             const prompt = `
-            Customize this LaTeX resume to match the job description exactly while preserving all formatting. Follow these rules:
+            Customize this LaTeX resume to match the provided job description **exactly** while maximizing ATS (Applicant Tracking System) compatibility. You must strictly preserve the original resume format and styling.
 
-1. Content Changes Only:
-- Highlight matching technical skills first
-- Reword experience bullets for job relevance
-- Adjust projects to showcase required tech
-- Keep education unchanged
+🛠️ Follow These Rules:
 
-2. Strict Format Preservation:
-- Maintain ALL original LaTeX commands
-- Keep identical section ordering
-- Preserve EXACT spacing between sections (do not add/remove blank lines)
-- Don't modify environments or styling
-- Don't add bullet point for styling it is taking too much spaces
+1. **Content Optimization Only:**
+   - Prioritize and list job-relevant technical skills at the top of the skill section.
+   - Update work experience bullet points to use strong action verbs and embed keywords from the job description naturally.
+   - Reframe project descriptions to emphasize technologies, frameworks, and responsibilities mentioned in the job.
+   - Leave the Education section unchanged.
+   - Include measurable outcomes, achievements, or quantifiable results where possible.
+   - Integrate important job-related keywords and phrasing for maximum ATS relevance.
+   - Use clear, concise, and keyword-rich language suitable for parsing by ATS.
 
-3. Output:
-- Return pure LaTeX code only
-- No explanations or commentary
-- Must compile exactly as original
+2. **LaTeX Format Must Be Preserved:**
+   - Do **not** change or add LaTeX formatting commands, spacing, environments, or layouts.
+   - **Do not** modify section ordering or structure.
+   - Keep **identical blank line spacing** between sections as in the original `.tex` file.
+   - Do **not** insert new LaTeX macros, packages, or environments.
+   - **Avoid extra bullet points or spacing adjustments** for styling purposes.
 
-Job: ${jobDescription}
-Resume: ${latexContent}
+3. **Output Format:**
+   - Return only the **updated, raw LaTeX code**, no commentary or explanations.
+   - Must be 100% compilable using Overleaf or any standard LaTeX compiler.
+   - Ensure that spacing, indentation, and formatting exactly match the original resume.
 
-Deliver compilation-ready LaTeX matching original spacing precisely.
+📄 Inputs:
+- **Job Description:** ${jobDescription}
+- **Original LaTeX Resume File Content:** ${latexContent}
+
+🎯 Objective:
+Produce a content-enhanced, ATS-optimized version of the resume based on the job description, using only content changes without any structural modifications to the LaTeX file.
+
+The final output must be a **compilation-ready `.tex` file** with:
+- Improved keyword relevance
+- ATS-friendly phrasing
+- 100% original format preservation
             `;
 
             const response = await fetch(`${API_BASE_URL}/chat/completions`, {
